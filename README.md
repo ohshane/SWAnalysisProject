@@ -1,4 +1,4 @@
-SWAnalysisProject
+SWAnalysisProject (H2)
 
 - 도서관 사서가 사용하는 도서관 어플리케이션
 - 도서관은 이름이 있고, 엄청많은 책(title(1개),author(1이상), unique catalogue number(중복되지않는 분류번호))들을 수장하고 있다.
