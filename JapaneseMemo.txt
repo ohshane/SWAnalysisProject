@@ -1,0 +1,25 @@
+﻿Develop a library application to support the librarian.
+図書館職員を助ける図書館アプリケーションの開発
+
+The library has a name, holds a number of books each of which has a title, 
+author and unique catalogue number. There are registered borroewers a book
+ and return it . However, each book transaction must be recorded by a librarian.
+She is also expected to register a new borrower, be able to display in increasing
+catalogue number order those books available for loan and those already out on loan.
+
+図書館には名前があり、それぞれにタイトル、著者（複数可）、一意のカタログ番号（重複していない）
+を持つ多数の書籍が保管されています。本にはボロウワーが登録されています。
+ただし、各書籍取引は図書館員が記録しなければなりません。
+また、新しい借り手を登録し、貸出可能な書
+籍とすでに貸出中の書籍を、カタログ番号順に表示できるようにする予定です。
+
+（＊同じタイトル、著者でもカタログ番号は違う）
+（＊同じ名前の人は登録できない）
+（＊カタログは大きい順に整列をする）
+（＊貸出中の本、貸出可能な本を表示することができる）
+
+図書館職員　ディスプレイ２、人の登録、貸出、受取、本の登録
+
+
+
+displayVooksAvailableForloan(book,identification) return type: info of Available loan books(title,author,catolog)
