@@ -1,3 +1,5 @@
+package Logic;
+
 public class Book {
 	private int catalogueNumber;
 	private String author;

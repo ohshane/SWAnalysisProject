@@ -1,3 +1,5 @@
+package Logic;
+
 public abstract class Librarian {
 
 	public abstract void registerOneBorrwer(String borrowerName);

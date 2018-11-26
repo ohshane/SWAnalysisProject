@@ -1,9 +1,7 @@
+package Logic;
+
 public class Library {
     private String name;
-
-    public Library() {
-
-    }
 
     public Library(String name) {
     	this.name = name;
@@ -31,5 +29,9 @@ public class Library {
     
     public void displayBooksForLoan() {
     	
+    }
+
+    public String getName() {
+        return name;
     }
 }
