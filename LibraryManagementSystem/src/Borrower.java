@@ -1,33 +1,27 @@
 public class Borrower {
     private String name;
     
-    public Borrower(String name)
-    {
+    public Borrower(String name) {
+        this.name = name;
+    }
+    
+    public void attachBook() {
     	
     }
     
-    public void attachBook()
-    {
+    public void detachBook() {
     	
     }
     
-    public void detachBook()
-    {
-    	
+    public int compareTo(Object obj) {
+    	return (int) obj;
     }
     
-    public int compareTo(Object obj)
-    {
-    	return (int) obj;//instead value
+    public boolean equals(Object obj) {
+    	return (boolean) obj;
     }
     
-    public boolean equals(Object obj)
-    {
-    	return (boolean) obj;//instead value
-    }
-    
-    public int hashCode()
-    {
-    	return 1;//instead value
+    public int hashCode() {
+        return 0;
     }
 }
