@@ -31,7 +31,7 @@ public class Library {
     
     public void displayBooksForLoan() {
     	Iterator iter = registeredBooks.iterator();
-    	System.out.println("/n"+"Books available for loan");
+    	System.out.println("/nBooks available for loan");
     	
     	while(iter.hasNext() == true)
     	{
