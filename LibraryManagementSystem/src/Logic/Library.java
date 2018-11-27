@@ -1,5 +1,7 @@
 package Logic;
 
+import java.util.Iterator;
+
 public class Library {
     private String name;
 
@@ -28,7 +30,17 @@ public class Library {
     }
     
     public void displayBooksForLoan() {
+    	Iterator iter = registeredBooks.iterator();
+    	System.out.println("/n"+"Books available for loan");
     	
+    	while(iter.hasNext() == true)
+    	{
+    		Book book = (Book)iter.next();
+    		if(book.getBorrower() == null)
+    		{
+    			 book.display();
+    		}
+    	}
     }
 
     public String getName() {
