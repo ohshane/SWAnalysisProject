@@ -14,6 +14,31 @@ public class Loan {
     private String loanEndDate;
 
     //const
+    public Loan() {
+        DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+        Date date = new Date();
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        System.out.println(sdf.format(cal.getTime()));
+
+
+
+        cal.add(Calendar.DATE, 7);
+        System.out.println(sdf.format(cal.getTime()));
+
+
+        try {
+            date = sdf.parse("2013-02-55");
+            cal.setTime(date);
+            System.out.println(sdf.format(cal.getTime()));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     public Loan(int catalogueID, int borrowerID) {
         this.catalogueID = catalogueID;
         this.borrowerID = borrowerID;
