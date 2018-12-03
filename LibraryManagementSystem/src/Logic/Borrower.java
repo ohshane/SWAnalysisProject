@@ -1,29 +1,42 @@
 package Logic;
 
 public class Borrower {
+    private int borrowerID;
     private String name;
-    
+
+    //const
     public Borrower(String name) {
         this.name = name;
     }
-    
-    public void attachBook() {
-    	
+
+    public Borrower(int borrowerID, String name) {
+        this.borrowerID = borrowerID;
+        this.name = name;
     }
-    
-    public void detachBook() {
-    	
+
+    //get-set
+    public int getBorrowerID() {
+        return borrowerID;
     }
-    
-    public int compareTo(Object obj) {
-    	return (int) obj;
+
+    public String getName() {
+        return name;
     }
-    
-    public boolean equals(Object obj) {
-    	return (boolean) obj;
+
+
+    public void setBorrowerID(int borrowerID) {
+        this.borrowerID = borrowerID;
     }
-    
-    public int hashCode() {
-        return 0;
+
+    public void setName(String name) {
+        this.name = name;
     }
+
+
+    //methods
+    @Override
+    public String toString() {
+        return String.format("%d, %s", borrowerID, name);
+    }
+
 }
