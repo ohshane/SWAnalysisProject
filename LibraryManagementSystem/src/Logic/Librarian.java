@@ -10,7 +10,7 @@ public abstract class Librarian {
 	
 	public abstract void returnOneBook(Book book);
 	
-	public abstract void displayBooksAvailableForLoan();
+	public abstract void displayBooksOnLoan();
 	
 	public abstract void displayBooksForLoan();
 

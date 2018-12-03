@@ -1,0 +1,14 @@
+INSERT INTO borrower (name) VALUES ('Bob');
+
+SELECT last_insert_rowid();
+
+SELECT l.catalogueID, b.title, b.author FROM loan AS l
+  LEFT JOIN book AS b ON l.catalogueID == b.catalogueID
+WHERE l.borrowerID ISNULL;
+
+SELECT l.catalogueID, b.title, b.author FROM loan AS l
+  LEFT JOIN book AS b ON l.catalogueID == b.catalogueID
+WHERE l.borrowerID IS NOT NULL;
+
+UPDATE OR IGNORE loan SET borrowerID = 1, loanStartDate = '1999-09-09', loanEndDate = '2022-02-22' WHERE catalogueID = 10;
+
