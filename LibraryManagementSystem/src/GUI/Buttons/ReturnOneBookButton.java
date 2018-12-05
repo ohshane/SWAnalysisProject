@@ -2,16 +2,19 @@ package GUI.Buttons;
 
 import GUI.HintTextField;
 import Logic.DB;
-
+import Logic.Library;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class ReturnOneBookButton extends JButton {
     private JFrame frame;
+    private Library lib;
 
-    public ReturnOneBookButton(JFrame frame) {
+    public ReturnOneBookButton(JFrame frame, Library lib) {
         this.frame = frame;
+        this.lib = lib;
+        
         this.setText("Return one book");
         this.addActionListener(e -> {
             ThisDialog thisDialog = new ThisDialog();
@@ -19,7 +22,7 @@ public class ReturnOneBookButton extends JButton {
             if (!thisDialog.getCatalogueIDField().getText().equals("")) {
                 try {
                     int catalogueID = Integer.parseInt(thisDialog.getCatalogueIDField().getText());
-                    DB.returnOneBook(catalogueID);
+                    lib.returnOneBook(catalogueID);
 
                 } catch (Exception exception) {
                     exception.printStackTrace();

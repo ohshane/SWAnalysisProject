@@ -4,6 +4,7 @@ package GUI.Buttons;
 import GUI.HintTextField;
 import Logic.Book;
 import Logic.DB;
+import Logic.Library;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,15 +12,18 @@ import java.awt.*;
 
 public class RegisterOneBookButton extends JButton {
     private JFrame frame;
+    private Library lib;
 
-    public RegisterOneBookButton(JFrame frame) {
+    public RegisterOneBookButton(JFrame frame, Library lib) {
         this.frame = frame;
+        this.lib = lib;
+        
         this.setText("Register one book");
         this.addActionListener(e -> {
             ThisDialog thisDialog = new ThisDialog();
 
             if (!thisDialog.getTitleField().getText().equals("") && !thisDialog.getAuthorField().getText().equals("")){
-                DB.registerOneBook(new Book(thisDialog.getTitleField().getText(), thisDialog.getAuthorField().getText()));
+                lib.registerOneBook(thisDialog.getTitleField().getText(), thisDialog.getAuthorField().getText());
             }
 
         });
@@ -33,7 +37,7 @@ public class RegisterOneBookButton extends JButton {
         private ThisDialog() {
             super(frame, true);
             this.setLayout(new FlowLayout());
-            this.add(new JLabel("Register new borrower here"));
+            this.add(new JLabel("Register new book here"));
             this.setSize(250, 200);
             this.setResizable(false);
 

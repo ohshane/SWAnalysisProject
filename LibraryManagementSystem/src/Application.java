@@ -17,8 +17,6 @@ public class Application {
         library.displayBooksForLoan();
         library.displayBooksOnLoan();
 
-        library.lendOneBook(5, 1);
-
         library.displayBooksForLoan();
         library.displayBooksOnLoan();
 

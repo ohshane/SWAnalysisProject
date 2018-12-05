@@ -8,6 +8,8 @@ import javax.swing.*;
 import java.awt.*;
 
 public class MainFrame extends JFrame {
+	private Library library;
+	
     public MainFrame() {
         this.setTitle(null);
         this.setLayout(new FlowLayout());
@@ -15,18 +17,18 @@ public class MainFrame extends JFrame {
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         InitialModalDialog initialModalDialog = new InitialModalDialog(this);
-        Library library = new Library(initialModalDialog.getInput());
+        library = new Library(initialModalDialog.getInput());
         DB.createNewDatabase("library.db");
         DB.createNewTable("library.db");
         System.out.printf("Successfully created Library Management System (%s)\n", library.getName());
         this.setTitle(library.getName());
 
-        JButton registerOneBorrowerB = new RegisterOneBorrowerButton(this);
-        JButton registerOneBookB = new RegisterOneBookButton(this);
-        JButton displayBooksForLoanB = new DisplayBooksForLoanButton(this);
-        JButton displayBooksOnLoanB = new DisplayBooksOnLoanButton(this);
-        JButton lendOneBookB = new LendOneBookButton(this);
-        JButton returnOneBookB = new ReturnOneBookButton(this);
+        JButton registerOneBorrowerB = new RegisterOneBorrowerButton(this, this.getLibrary());
+        JButton registerOneBookB = new RegisterOneBookButton(this, this.getLibrary());
+        JButton displayBooksForLoanB = new DisplayBooksForLoanButton(this, this.getLibrary());
+        JButton displayBooksOnLoanB = new DisplayBooksOnLoanButton(this, this.getLibrary());
+        JButton lendOneBookB = new LendOneBookButton(this, this.getLibrary());
+        JButton returnOneBookB = new ReturnOneBookButton(this, this.getLibrary());
 
         this.add(registerOneBorrowerB);
         this.add(registerOneBookB);
@@ -37,5 +39,10 @@ public class MainFrame extends JFrame {
 
 
         this.setVisible(true);
+        
+    }
+    
+    public Library getLibrary() {
+    	return library;
     }
 }

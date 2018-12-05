@@ -4,6 +4,7 @@ package GUI.Buttons;
 import GUI.HintTextField;
 import Logic.Borrower;
 import Logic.DB;
+import Logic.Library;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,15 +12,18 @@ import java.awt.*;
 
 public class RegisterOneBorrowerButton extends JButton {
     private JFrame frame;
+    private Library lib;
 
-    public RegisterOneBorrowerButton(JFrame frame) {
+    public RegisterOneBorrowerButton(JFrame frame, Library lib) {
         this.frame = frame;
+        this.lib = lib;
+        
         this.setText("Register one borrower");
         this.addActionListener(e -> {
             ThisDialog thisDialog = new ThisDialog();
 
             if (!thisDialog.getNameField().getText().equals("")) {
-                DB.registerOneBorrower(new Borrower(thisDialog.getNameField().getText()));
+                lib.registerOneBorrwer(thisDialog.getNameField().getText());
             }
 
         });

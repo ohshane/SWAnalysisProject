@@ -2,25 +2,30 @@ package GUI.Buttons;
 
 import GUI.HintTextField;
 import Logic.DB;
+import Logic.Library;
 import Logic.Loan;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class LendOneBookButton extends JButton {
-    private JFrame frame;
-
-    public LendOneBookButton(JFrame frame) {
+	private JFrame frame;
+	private Library lib;
+	
+    public LendOneBookButton(JFrame frame, Library lib) {
         this.frame = frame;
+        this.lib = lib;
+        
         this.setText("Lend one book");
         this.addActionListener(e -> {
             ThisDialog thisDialog = new ThisDialog();
 
-            if (!thisDialog.getCatalogueIDField().getText().equals("") && !thisDialog.getBorrowerIDField().getText().equals("")) {
+            if (!thisDialog.getCatalogueIDField().getText().equals("") && !thisDialog.getNameField().getText().equals("")) {
                 try {
                     int catalogueID = Integer.parseInt(thisDialog.getCatalogueIDField().getText());
-                    int borrowerID = Integer.parseInt(thisDialog.getBorrowerIDField().getText());
-                    DB.lendOneBook(new Loan(catalogueID, borrowerID));
+                    String name = thisDialog.getNameField().getText();
+                    lib.lendOneBook(catalogueID, name);
+                    
 
                 } catch (Exception exception) {
                     exception.printStackTrace();
@@ -33,7 +38,7 @@ public class LendOneBookButton extends JButton {
 
     private class ThisDialog extends JDialog {
         private JTextField catalogueID;
-        private JTextField borrowerID;
+        private JTextField name;
         private JButton okButton;
 
         private ThisDialog() {
@@ -46,8 +51,8 @@ public class LendOneBookButton extends JButton {
             catalogueID = new HintTextField("Catalogue ID", 20);
             this.add(catalogueID);
 
-            borrowerID = new HintTextField("Borrower ID", 20);
-            this.add(borrowerID);
+            name = new HintTextField("Borrower name", 20);
+            this.add(name);
 
             okButton = new JButton("OK");
             okButton.addActionListener(e -> setVisible(false));
@@ -59,8 +64,8 @@ public class LendOneBookButton extends JButton {
             return catalogueID;
         }
 
-        public JTextField getBorrowerIDField() {
-            return borrowerID;
+        public JTextField getNameField() {
+            return name;
         }
     }
 

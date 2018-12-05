@@ -7,33 +7,30 @@ public class DB {
     public static String fileName = "library.db";
     public static String url = "jdbc:sqlite:./db/" + fileName;
 
-//    public static void main(String[] args) {
-//        Scanner scanner = new Scanner(System.in);
-//        System.out.print("Select your *.db file");
-//        String s = scanner.next();
-//        fileName = s;
-//    }
+    public static void main(String[] args) {
+    	createNewDatabase(url);
+    	connect(url);
+    }
 
-//	public static void connect(String fileName) {
-//		Connection conn = null;
-//		try {
-//			String url = "jdbc:sqlite:./db/" + fileName;
-//			conn = DriverManager.getConnection(url);
-//
-//			System.out.println("Connected");
-//
-//		} catch (SQLException e) {
-//			System.out.println(e.getMessage());
-//		} finally {
-//			try {
-//                if (conn != null) {
-//                    conn.close();
-//                }
-//            } catch (SQLException e) {
-//                System.out.println(e.getMessage());
-//            }
-//		}
-//	}
+	public static void connect(String url) {
+		Connection conn = null;
+		try {
+			conn = DriverManager.getConnection(url);
+
+			System.out.println("Connected");
+
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		} finally {
+			try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
+            }
+		}
+	}
 	
 	public static void createNewDatabase(String fileName) {
 
@@ -60,7 +57,7 @@ public class DB {
 
         String sqlBorrowerCreate = "CREATE TABLE IF NOT EXISTS borrower(" +
                 "borrowerID INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "name VARCHAR(45) NOT NULL, UNIQUE(name))";
+                "name VARCHAR(45) NOT NULL, UNIQUE(borrowerID, name))";
 
         String sqlLoanCreate = "CREATE TABLE IF NOT EXISTS loan(" +
                 "catalogueID INTEGER PRIMARY KEY, " +
@@ -83,19 +80,27 @@ public class DB {
 
 
     public static void registerOneBorrower(Borrower borrower) {
-        String sql = String.format("INSERT OR IGNORE INTO borrower (name) VALUES ('%s')", borrower.getName());
 
-        try (Connection conn = DriverManager.getConnection(url);
-            Statement stmt = conn.createStatement()) {
+        if (!DB.isBorrowerExist(borrower.getName())) {
 
-            if (stmt.execute(sql)) {
-                System.out.printf("registered one borrower: %s\n", borrower);
+            String sql = String.format("INSERT OR IGNORE INTO borrower (name) VALUES ('%s')", borrower.getName());
+
+            try (Connection conn = DriverManager.getConnection(url);
+                Statement stmt = conn.createStatement()) {
+
+                stmt.execute(sql);
+                sql = "SELECT borrowerID FROM borrower ORDER BY borrowerID DESC LIMIT 1";
+
+                ResultSet rs = stmt.executeQuery(sql);
+
+                System.out.printf("이용자를 등록했습니다. %d, %s\n", rs.getInt(1), borrower.getName());
+
+            } catch (SQLException e) {
+                System.out.println("이용자등록을 등록실패했습니다." + e.getMessage());
             }
-
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+        } else {
+            System.out.println("이용자등록을 등록실패했습니다.");
         }
-
     }
 
     public static void registerOneBook(Book book) {
@@ -103,24 +108,18 @@ public class DB {
         try (Connection conn = DriverManager.getConnection(url);
             Statement stmt = conn.createStatement()) {
 
-            if (stmt.execute(sql)) {
-                System.out.printf("added one book: %s\n", book);
-            }
-
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-
-        sql = "SELECT catalogueID FROM book ORDER BY catalogueID DESC LIMIT 1";
-        try (Connection conn = DriverManager.getConnection(url);
-            Statement stmt = conn.createStatement()) {
-            ResultSet rs = stmt.executeQuery(sql);
-
-            sql = "INSERT OR IGNORE INTO loan (catalogueID) VALUES (" + rs.getInt(1) + ")";
             stmt.execute(sql);
-
+            
+            sql = "SELECT catalogueID FROM book ORDER BY catalogueID DESC LIMIT 1";
+            ResultSet rs = stmt.executeQuery(sql);
+            int i = rs.getInt(1);
+            
+            sql = "INSERT OR IGNORE INTO loan (catalogueID) VALUES (" + i + ")";
+            stmt.execute(sql);
+            System.out.printf("책을 등록했습니다. %d, %s, %s\n", i, book.getTitle(), book.getAuthor());
+            
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+        	System.out.println("책을 등록실패했습니다." + e.getMessage());
         }
 
     }
@@ -152,8 +151,9 @@ public class DB {
     }
 
     public static String displayBooksOnLoan() {
-	    String sql = "SELECT l.catalogueID, b.title, b.author, l.loanStartDate, l.loanEndDate FROM loan AS l " +
+	    String sql = "SELECT l.catalogueID, b.title, b.author, bo.borrowerID, bo.name, l.loanStartDate, l.loanEndDate FROM loan AS l " +
                 "LEFT JOIN book AS b ON l.catalogueID == b.catalogueID " +
+	    		"LEFT JOIN borrower as bo ON l.borrowerID == bo.borrowerID " +
                 "WHERE l.borrowerID IS NOT NULL";
 
         try (Connection conn = DriverManager.getConnection(url);
@@ -164,7 +164,7 @@ public class DB {
 
             System.out.println("books on loan: ");
             while (rs.next()) {
-                sb.append(String.format("%d, %s, %s, %s, %s\n", rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5)));
+                sb.append(String.format("%d, %s, %s, %d, %s, %s, %s\n", rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getString(5), rs.getString(6), rs.getString(7)));
             }
 
             System.out.println(sb.toString());
@@ -177,18 +177,31 @@ public class DB {
     }
 
     public static void lendOneBook(Loan loan) {
-        String sql = String.format("UPDATE OR IGNORE loan SET borrowerID = %d, loanStartDate = '%s', loanEndDate = '%s' WHERE catalogueID = %d",
-                loan.getBorrowerID(), loan.getLoanStartDate(), loan.getLoanEndDate(), loan.getCatalogueID());
 
+        String sql = String.format("SELECT borrowerID FROM borrower WHERE name = '%s'", loan.getName());
+        int borrowerID = 0;
         try (Connection conn = DriverManager.getConnection(url);
             Statement stmt = conn.createStatement()) {
 
-            if (stmt.execute(sql)) {
-                System.out.printf("lended one book: %s\n", loan);
-            }
+        	ResultSet rs = stmt.executeQuery(sql);
+            borrowerID = rs.getInt(1);
 
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.out.println("대출실패되었습니다. " + e.getMessage());
+        }
+
+        sql = String.format("UPDATE OR IGNORE loan SET borrowerID = %d, loanStartDate = '%s', loanEndDate = '%s' WHERE catalogueID = %d AND borrowerID IS NULL",
+                borrowerID, loan.getLoanStartDate(), loan.getLoanEndDate(), loan.getCatalogueID());
+
+        try (Connection conn = DriverManager.getConnection(url);
+            Statement stmt = conn.createStatement()) {
+        	
+        	stmt.execute(sql);
+        	System.out.println("대출되었습니다.");
+            
+
+        } catch (SQLException e) {
+            System.out.println("대출실패되었습니다. " + e.getMessage());
         }
     }
 
@@ -198,25 +211,76 @@ public class DB {
         try (Connection conn = DriverManager.getConnection(url);
             Statement stmt = conn.createStatement()) {
 
-            if (stmt.execute(sql)) {
-                System.out.printf("returned one book: %s\n", catalogueID);
+            stmt.execute(sql);
+            
+            System.out.println("반납되었습니다.");
+
+        } catch (SQLException e) {
+            System.out.println("반납실패되었습니다." + e.getMessage());
+        }
+    }
+    
+    public static boolean isBookExist(int catalogueID) {
+    	String sql = "SELECT count(catalogueID) FROM book WHERE catalogueID = " + catalogueID + ";";
+    	
+    	int i = 0;
+        try (Connection conn = DriverManager.getConnection(url);
+            Statement stmt = conn.createStatement()) {
+            ResultSet rs = stmt.executeQuery(sql);
+            
+            if (rs.next()) {
+                i = rs.getInt(1);
+            }
+            
+            System.out.println(i);
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+        
+        return i > 0 ? true : false;
+    }
+    
+    public static boolean isBorrowerExist(int borrowerID) {
+    	String sql = "SELECT count(borrowerID) FROM borrower WHERE borrowerID = " + borrowerID + ";";
+    	
+    	int i = 0;
+        try (Connection conn = DriverManager.getConnection(url);
+            Statement stmt = conn.createStatement()) {
+            ResultSet rs = stmt.executeQuery(sql);
+            
+            if (rs.next()) {
+                i = rs.getInt(1);
             }
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+            return false;
         }
+        
+        return i > 0 ? true : false;
     }
 
-//    private static boolean execute(String s) {
-//	    try (Connection conn = DriverManager.getConnection(url);
-//            Statement stmt = conn.createStatement()) {
-//            stmt.execute(s);
-//            return true;
-//
-//        } catch (SQLException e) {
-//            System.out.println(e.getMessage());
-//            return false;
-//        }
-//    }
+    public static boolean isBorrowerExist(String name) {
+    	String sql = String.format("SELECT count(borrowerID) FROM borrower WHERE name = '%s'", name);
+
+    	int i = 0;
+        try (Connection conn = DriverManager.getConnection(url);
+            Statement stmt = conn.createStatement()) {
+            ResultSet rs = stmt.executeQuery(sql);
+
+            if (rs.next()) {
+                i = rs.getInt(1);
+            }
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+
+        return i > 0 ? true : false;
+    }
+
 
 }
