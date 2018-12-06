@@ -32,3 +32,4 @@ catalogue number order those books available for loan and those already out on l
 
 図書館職員　ディスプレイ２、人の登録、貸出、受取、本の登録
 
+
